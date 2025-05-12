@@ -42,12 +42,32 @@ function Sidebar() {
           </li>
           <li>
             <Link
-              to="/schedule"
+              to="/add-schedule"
               className={`flex items-center gap-2 p-3 rounded-md hover:bg-primary-900 ${
-                isActive("/schedules") ? "bg-primary-900 font-bold" : ""
+                isActive("/add-schedule") ? "bg-primary-900 font-bold" : ""
               }`}
             >
-              <FaCalendarAlt /> Schedules
+              <FaCalendarAlt /> Add Schedule
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/view-schedules"
+              className={`flex items-center gap-2 p-3 rounded-md hover:bg-primary-900 ${
+                isActive("/view-schedules") ? "bg-primary-900 font-bold" : ""
+              }`}
+            >
+              <FaCalendarAlt /> View Schedules
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/bus"
+              className={`flex items-center gap-2 p-3 rounded-md hover:bg-primary-900 ${
+                isActive("/bus") ? "bg-primary-900 font-bold" : ""
+              }`}
+            >
+              <FaCalendarAlt /> Buses
             </Link>
           </li>
         </ul>
