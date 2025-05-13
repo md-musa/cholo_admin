@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from "react";
 import apiClient from "../config/axiosConfig";
 import { showSuccess, showError, showLoading, dismissToast } from "../utils/toastUtils";
-const BUS_STATUS = {
-  ACTIVE: "active",
-  INACTIVE: "inactive",
-  MAINTENANCE: "maintenance",
-};
-
-const BUS_TYPES = {
-  STUDENT: "student",
-  EMPLOYEE: "employee",
-};
+import { BUS_STATUS, BUS_TYPES } from "../constants";
 
 const BusPage = () => {
   const [buses, setBuses] = useState([]);
@@ -41,10 +32,6 @@ const BusPage = () => {
       // Fetch routes for dropdown
       const routesResponse = await apiClient.get("/routes");
       setRoutes(routesResponse.data.data);
-
-      // Fetch drivers (assuming they have role=driver)
-      const driversResponse = await apiClient.get("/users?role=driver");
-      setDrivers(driversResponse.data.data);
 
       dismissToast(loadingToast);
       showSuccess("Data loaded successfully");
@@ -133,7 +120,7 @@ const BusPage = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Manage Buses</h2>
+      <h2 className="text-2xl font-bold mb-4">Add Bus</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -162,8 +149,8 @@ const BusPage = () => {
               required
             >
               {Object.values(BUS_TYPES).map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}
+                <option className="capitalize" key={type} value={type}>
+                  {type}
                 </option>
               ))}
             </select>
@@ -196,8 +183,8 @@ const BusPage = () => {
               onChange={(e) => setForm({ ...form, status: e.target.value })}
             >
               {Object.values(BUS_STATUS).map((status) => (
-                <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
+                <option className="capitalize" key={status} value={status}>
+                  { status}
                 </option>
               ))}
             </select>
@@ -277,12 +264,12 @@ const BusPage = () => {
               {buses.map((bus, index) => (
                 <tr key={bus._id}>
                   <td>{index + 1}</td>
-                  <td className="font-medium">{bus.name}</td>
-                  <td>{bus.busType}</td>
-                  <td>{bus.capacity}</td>
+                  <td className="font-medium capitalize">{bus.name}</td>
+                  <td className="capitalize">{bus.busType}</td>
+                  <td className="capitalize">{bus.capacity}</td>
                   <td>
                     <span
-                      className={`badge ${
+                      className={`badge capitalize ${
                         bus.status === BUS_STATUS.ACTIVE
                           ? "badge-success"
                           : bus.status === BUS_STATUS.MAINTENANCE

@@ -12,28 +12,8 @@ import {
   FaBus,
 } from "react-icons/fa";
 import { MdDirectionsBus } from "react-icons/md";
-
-export const SCHEDULE_DIRECTIONS = {
-  TO_CAMPUS: "to_campus",
-  FROM_CAMPUS: "from_campus",
-};
-
-export const SCHEDULE_USER_TYPES = {
-  STUDENT: "student",
-  EMPLOYEE: "employee",
-};
-
-export const SCHEDULE_MODES = {
-  REGULAR: "regular",
-  MID_TERM: "mid_term",
-  FINAL_TERM: "final_term",
-  RAMADAN: "ramadan",
-};
-
-export const SCHEDULE_OPERATING_DAYS = {
-  WEEKDAYS: "weekdays",
-  FRIDAY: "friday",
-};
+import { SCHEDULE_DIRECTIONS, SCHEDULE_MODES, SCHEDULE_OPERATING_DAYS, SCHEDULE_USER_TYPES } from "../constants";
+import { formatTime, getEnumLabel, groupSchedule } from "../utils/scheduleutil";
 
 const AddSchedule = () => {
   const [schedules, setSchedules] = useState([]);
@@ -51,6 +31,8 @@ const AddSchedule = () => {
     operatingDays: SCHEDULE_OPERATING_DAYS.WEEKDAYS,
     note: "",
   });
+
+  console.log(form);
 
   const [editId, setEditId] = useState(null);
 
@@ -86,34 +68,8 @@ const AddSchedule = () => {
   });
 
   // Group schedules hierarchically
-  const groupedSchedules = filteredSchedules.reduce((groups, schedule) => {
-    const routeId = schedule.routeId?._id || "unknown";
-    const userType = schedule.userType;
-    const operatingDays = schedule.operatingDays;
-    const direction = schedule.direction;
+  const groupedSchedules = groupSchedule(filteredSchedules);
 
-    if (!groups[routeId]) {
-      groups[routeId] = {
-        route: schedule.routeId,
-        students: { weekdays: { to: [], from: [] }, friday: { to: [], from: [] } },
-        employees: { weekdays: { to: [], from: [] }, friday: { to: [], from: [] } },
-      };
-    }
-
-    const group = groups[routeId];
-    const userGroup = userType === SCHEDULE_USER_TYPES.STUDENT ? group.students : group.employees;
-    const dayGroup = operatingDays === SCHEDULE_OPERATING_DAYS.WEEKDAYS ? userGroup.weekdays : userGroup.friday;
-
-    if (direction === SCHEDULE_DIRECTIONS.TO_CAMPUS) {
-      dayGroup.to.push(schedule);
-    } else {
-      dayGroup.from.push(schedule);
-    }
-
-    return groups;
-  }, {});
-
-  // ... (keep all your existing handler functions like handleSubmit, formatTime, etc.) ...
   const handleSubmit = async (e) => {
     e.preventDefault();
     const loadingToast = showLoading(editId ? "Updating schedule..." : "Creating schedule...");
@@ -121,7 +77,6 @@ const AddSchedule = () => {
     try {
       const payload = {
         ...form,
-        time: formatTime(form.time),
       };
 
       if (editId) {
@@ -140,16 +95,6 @@ const AddSchedule = () => {
     } finally {
       dismissToast(loadingToast);
     }
-  };
-
-  const formatTime = (time) => {
-    if (!time.includes(":")) {
-      if (time.length === 3) {
-        return `${time.slice(0, 1)}:${time.slice(1)}`;
-      }
-      return `${time.slice(0, 2)}:${time.slice(2)}`;
-    }
-    return time;
   };
 
   const handleEdit = (schedule) => {
@@ -195,25 +140,17 @@ const AddSchedule = () => {
     }
   };
 
-  const getEnumLabel = (value) => {
-    return value
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
-
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
         <MdDirectionsBus className="text-blue-500" /> Add Schedule
       </h2>
 
-      {/* Schedule Form (keep your existing form) */}
+      {/*-------Schedule Form (keep your existing form) ---------*/}
       <div className="card bg-base-100 shadow-md mb-6">
         <div className="card-body">
           <h3 className="card-title">{editId ? "Edit Schedule" : "Add New Schedule"}</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* ... (keep your existing form fields exactly as they are) ... */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="label">
@@ -259,8 +196,8 @@ const AddSchedule = () => {
                   <span className="label-text">Time* (HH:mm)</span>
                 </label>
                 <input
-                  type="text"
-                  placeholder="08:30"
+                  type="time"
+                  placeholder="08:30 AM/PM"
                   className="input input-bordered w-full"
                   value={form.time}
                   onChange={(e) => setForm({ ...form, time: e.target.value })}
@@ -329,9 +266,10 @@ const AddSchedule = () => {
               <label className="label">
                 <span className="label-text">Note</span>
               </label>
-              <textarea
-                placeholder="Additional notes (optional)"
-                className="textarea textarea-bordered w-full"
+              <input
+                type="text"
+                placeholder="Ex. The bus will go up to Mirpur-10"
+                className="input input-bordered w-full"
                 value={form.note}
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
               />

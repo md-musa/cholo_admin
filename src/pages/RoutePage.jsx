@@ -39,13 +39,14 @@ const RoutePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const loadingToast = showLoading(editId ? "Updating route..." : "Creating route...");
-    
+
     try {
       const payload = {
         ...form,
-        totalDistance: form.totalDistance ? Number(form.totalDistance) : undefined,
-        estimatedTime: form.estimatedTime ? Number(form.estimatedTime) : undefined,
+        totalDistance: form.totalDistance ? parseFloat(form.totalDistance) : undefined,
+        estimatedTime: form.estimatedTime ? parseInt(form.estimatedTime) : undefined,
       };
+      console.log("Payload:", payload);
 
       if (editId) {
         await apiClient.put(`/routes/${editId}`, payload);
@@ -54,7 +55,7 @@ const RoutePage = () => {
         await apiClient.post(`/routes`, payload);
         showSuccess("Route created successfully");
       }
-      
+
       fetchRoutes();
       resetForm();
     } catch (err) {
@@ -92,7 +93,7 @@ const RoutePage = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this route?")) return;
-    
+
     const loadingToast = showLoading("Deleting route...");
     try {
       await apiClient.delete(`/routes/${id}`);
@@ -108,7 +109,7 @@ const RoutePage = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Manage Routes</h2>
+      <h2 className="text-2xl font-bold mb-4">Add Route</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -125,7 +126,7 @@ const RoutePage = () => {
               required
             />
           </div>
-          
+
           <div>
             <label className="label">
               <span className="label-text">Start Location*</span>
@@ -139,7 +140,7 @@ const RoutePage = () => {
               required
             />
           </div>
-          
+
           <div>
             <label className="label">
               <span className="label-text">End Location*</span>
@@ -168,9 +169,10 @@ const RoutePage = () => {
               onChange={(e) => setForm({ ...form, totalDistance: e.target.value })}
               min="0"
               step="0.1"
+              reequired
             />
           </div>
-          
+
           <div>
             <label className="label">
               <span className="label-text">Estimated Time (minutes)</span>
@@ -182,17 +184,18 @@ const RoutePage = () => {
               value={form.estimatedTime}
               onChange={(e) => setForm({ ...form, estimatedTime: e.target.value })}
               min="0"
+              required
             />
           </div>
         </div>
 
         <div>
           <label className="label">
-            <span className="label-text">Wayline (JSON or raw text)</span>
+            <span className="label-text">Wayline (Geojson)</span>
           </label>
           <textarea
-            placeholder="Enter wayline data (JSON format preferred)"
-            className="textarea textarea-bordered w-full h-32 font-mono text-sm"
+            placeholder="Enter wayline data (Geojson format)"
+            className="textarea textarea-bordered w-full font-mono text-sm"
             value={form.wayline}
             onChange={(e) => setForm({ ...form, wayline: e.target.value })}
           />
@@ -210,6 +213,7 @@ const RoutePage = () => {
         </div>
       </form>
 
+      <h2 className="text-2xl font-bold my-5">Routes List</h2>
       {loading ? (
         <div className="flex justify-center">
           <span className="loading loading-spinner loading-lg"></span>
@@ -238,16 +242,10 @@ const RoutePage = () => {
                   <td>{route.totalDistance || "-"} km</td>
                   <td>{route.estimatedTime || "-"} min</td>
                   <td className="flex space-x-1">
-                    <button 
-                      onClick={() => handleEdit(route)} 
-                      className="btn btn-sm btn-outline btn-info"
-                    >
+                    <button onClick={() => handleEdit(route)} className="btn btn-sm btn-outline btn-info">
                       Edit
                     </button>
-                    <button 
-                      onClick={() => handleDelete(route._id)} 
-                      className="btn btn-sm btn-outline btn-error"
-                    >
+                    <button onClick={() => handleDelete(route._id)} className="btn btn-sm btn-outline btn-error">
                       Delete
                     </button>
                   </td>

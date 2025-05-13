@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  console.log(userData);
   useEffect(() => {
     const loadUserData = () => {
       try {

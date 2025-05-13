@@ -6,7 +6,6 @@ import Sidebar from "./components/Sidebar";
 import LoginPage from "./pages/LoginPage";
 import Navbar from "./components/Navbar";
 import BusPage from "./pages/BusPage";
-import ViewSchedules from "./pages/ViewSchedules";
 import AddSchedule from "./pages/AddSchedule";
 
 const DashboardLayout = () => {
@@ -20,8 +19,7 @@ const DashboardLayout = () => {
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/route" element={<RoutePage />} />
-            <Route path="/add-schedule" element={<AddSchedule/>} />
-            <Route path="/view-schedules" element={<ViewSchedules />} />
+            <Route path="/add-schedule" element={<AddSchedule />} />
             <Route path="/bus" element={<BusPage />} />
           </Routes>
         </div>
