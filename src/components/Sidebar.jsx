@@ -1,12 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  FaRoute,
-  FaCalendarPlus,
-  FaCalendarCheck,
-  FaBus,
-  FaTachometerAlt,
-} from "react-icons/fa";
+import { FaRoute, FaCalendarPlus, FaCalendarCheck, FaBus, FaTachometerAlt, FaInfo } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 
 function Sidebar() {
@@ -21,6 +15,7 @@ function Sidebar() {
     { label: "Schedule", to: "/add-schedule", icon: <FaCalendarPlus /> },
     // { label: "View Schedules", to: "/view-schedules", icon: <FaCalendarCheck /> },
     { label: "Buses", to: "/bus", icon: <FaBus /> },
+    { label: "Logs", to: "/logs", icon: <FaInfo /> },
   ];
 
   return (
@@ -29,25 +24,16 @@ function Sidebar() {
 
       <div className="drawer-content">
         {/* Page content */}
-        <label
-          htmlFor="my-drawer-2"
-          className="btn btn-primary drawer-button lg:hidden m-4"
-        >
+        <label htmlFor="my-drawer-2" className="btn btn-primary drawer-button lg:hidden m-4">
           Open Sidebar
         </label>
       </div>
 
       <div className="drawer-side">
-        <label
-          htmlFor="my-drawer-2"
-          aria-label="close sidebar"
-          className="drawer-overlay"
-        ></label>
+        <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
 
         <ul className="menu p-5 w-72 min-h-full bg-slate-700 text-white space-y-2">
-          <h2 className="text-xl font-semibold mb-4 text-gray-100">
-            Admin Menu
-          </h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-100">Admin Menu</h2>
 
           {navItems.map((item) => (
             <li key={item.to}>

@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import Navbar from "./components/Navbar";
 import BusPage from "./pages/BusPage";
 import AddSchedule from "./pages/AddSchedule";
+import Logs from "./pages/Logs";
 
 const DashboardLayout = () => {
   return (
@@ -21,6 +22,7 @@ const DashboardLayout = () => {
             <Route path="/route" element={<RoutePage />} />
             <Route path="/add-schedule" element={<AddSchedule />} />
             <Route path="/bus" element={<BusPage />} />
+            <Route path="/logs" element={<Logs />} />
           </Routes>
         </div>
       </div>
