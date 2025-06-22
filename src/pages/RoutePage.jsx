@@ -6,12 +6,10 @@ const RoutePage = () => {
   const [routes, setRoutes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    name: "",
-    startLocation: "",
-    endLocation: "",
+    routeNo: "",
+    routeName: "",
     totalDistance: "",
     estimatedTime: "",
-    wayline: "",
   });
   const [editId, setEditId] = useState(null);
 
@@ -68,12 +66,10 @@ const RoutePage = () => {
 
   const handleEdit = (route) => {
     setForm({
-      name: route.name,
-      startLocation: route.startLocation,
-      endLocation: route.endLocation,
+      routeNo: route.routeNo,
+      routeName: route.routeName,
       totalDistance: route.totalDistance || "",
       estimatedTime: route.estimatedTime || "",
-      wayline: route.wayline || "",
     });
     setEditId(route._id);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -81,12 +77,10 @@ const RoutePage = () => {
 
   const resetForm = () => {
     setForm({
-      name: "",
-      startLocation: "",
-      endLocation: "",
+      routeNo: "",
+      routeName: "",
       totalDistance: "",
       estimatedTime: "",
-      wayline: "",
     });
     setEditId(null);
   };
@@ -115,42 +109,28 @@ const RoutePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="label">
-              <span className="label-text">Route Name*</span>
+              <span className="label-text">Route No.*</span>
             </label>
             <input
               type="text"
-              placeholder="Route Name"
+              placeholder="Ex: R1, R2 format"
               className="input input-bordered w-full"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              value={form.routeNo}
+              onChange={(e) => setForm({ ...form, routeNo: e.target.value })}
               required
             />
           </div>
 
           <div>
             <label className="label">
-              <span className="label-text">Start Location*</span>
+              <span className="label-text">Route Name*</span>
             </label>
             <input
               type="text"
               placeholder="Start Location"
               className="input input-bordered w-full"
-              value={form.startLocation}
-              onChange={(e) => setForm({ ...form, startLocation: e.target.value })}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="label">
-              <span className="label-text">End Location*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="End Location"
-              className="input input-bordered w-full"
-              value={form.endLocation}
-              onChange={(e) => setForm({ ...form, endLocation: e.target.value })}
+              value={form.routeName}
+              onChange={(e) => setForm({ ...form, routeName: e.target.value })}
               required
             />
           </div>
@@ -189,18 +169,6 @@ const RoutePage = () => {
           </div>
         </div>
 
-        <div>
-          <label className="label">
-            <span className="label-text">Wayline (Geojson)</span>
-          </label>
-          <textarea
-            placeholder="Enter wayline data (Geojson format)"
-            className="textarea textarea-bordered w-full font-mono text-sm"
-            value={form.wayline}
-            onChange={(e) => setForm({ ...form, wayline: e.target.value })}
-          />
-        </div>
-
         <div className="flex space-x-2">
           <button type="submit" className="btn btn-primary">
             {editId ? "Update Route" : "Add Route"}
@@ -212,6 +180,7 @@ const RoutePage = () => {
           )}
         </div>
       </form>
+      <hr className="border-gray-300 border" />
 
       <h2 className="text-2xl font-bold my-5">Routes List</h2>
       {loading ? (
@@ -223,10 +192,8 @@ const RoutePage = () => {
           <table className="table w-full">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Start</th>
-                <th>End</th>
+                <th>Route No</th>
+                <th>Route Name</th>
                 <th>Distance</th>
                 <th>Time</th>
                 <th>Actions</th>
@@ -235,10 +202,8 @@ const RoutePage = () => {
             <tbody>
               {routes.map((route, index) => (
                 <tr key={route._id}>
-                  <td>{index + 1}</td>
-                  <td>{route.name}</td>
-                  <td>{route.startLocation}</td>
-                  <td>{route.endLocation}</td>
+                  <td>{route.routeNo}</td>
+                  <td>{route.routeName}</td>
                   <td>{route.totalDistance || "-"} km</td>
                   <td>{route.estimatedTime || "-"} min</td>
                   <td className="flex space-x-1">

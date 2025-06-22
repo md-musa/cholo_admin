@@ -99,7 +99,7 @@ function Logs() {
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-grow">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FiSearch className="text-gray-400" />
+            <FiSearch className="text-muted-400" />
           </div>
           <input
             type="text"

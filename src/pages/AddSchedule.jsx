@@ -30,6 +30,7 @@ const AddSchedule = () => {
     mode: SCHEDULE_MODES.REGULAR,
     operatingDays: SCHEDULE_OPERATING_DAYS.WEEKDAYS,
     note: "",
+    serviceType: "",
   });
 
   console.log(form);
@@ -40,8 +41,13 @@ const AddSchedule = () => {
     try {
       setLoading(true);
       const loadingToast = showLoading("Loading schedules...");
+      // if (!selectedRoute) return;
 
-      const schedulesResponse = await apiClient.get("/schedules");
+      const schedulesResponse = await apiClient.get("/schedules", {
+        params: {
+          routeId: selectedRoute || undefined,
+        },
+      });
       setSchedules(schedulesResponse.data.data);
 
       const routesResponse = await apiClient.get("/routes");
@@ -60,7 +66,7 @@ const AddSchedule = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedRoute]);
 
   // Filter schedules based on selections
   const filteredSchedules = schedules.filter((schedule) => {
@@ -88,7 +94,7 @@ const AddSchedule = () => {
       }
 
       fetchData();
-      resetForm();
+      // resetForm();
     } catch (err) {
       showError(err.response?.data?.message || "Failed to save schedule");
       console.error("Save schedule error:", err);
@@ -106,6 +112,7 @@ const AddSchedule = () => {
       mode: schedule.mode,
       operatingDays: schedule.operatingDays,
       note: schedule.note || "",
+      serviceType: schedule.serviceType || "",
     });
     setEditId(schedule._id);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -120,6 +127,7 @@ const AddSchedule = () => {
       mode: SCHEDULE_MODES.REGULAR,
       operatingDays: SCHEDULE_OPERATING_DAYS.WEEKDAYS,
       note: "",
+      serviceType: "",
     });
     setEditId(null);
   };
@@ -165,7 +173,7 @@ const AddSchedule = () => {
                   <option value="">Select Route</option>
                   {routes.map((route) => (
                     <option key={route._id} value={route._id}>
-                      {route.name} ({route.startLocation} to {route.endLocation})
+                      {route.routeNo + ": " + route.routeName}
                     </option>
                   ))}
                 </select>
@@ -267,11 +275,23 @@ const AddSchedule = () => {
                 <span className="label-text">Note</span>
               </label>
               <input
+                onChange={(e) => setForm({ ...form, note: e.target.value })}
                 type="text"
                 placeholder="Ex. The bus will go up to Mirpur-10"
                 className="input input-bordered w-full"
                 value={form.note}
-                onChange={(e) => setForm({ ...form, note: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="label">
+                <span className="label-text">Service Type</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Ex. Shuttle Service"
+                className="input input-bordered w-full"
+                value={form.serviceType}
+                onChange={(e) => setForm({ ...form, serviceType: e.target.value })}
               />
             </div>
 
@@ -289,8 +309,9 @@ const AddSchedule = () => {
         </div>
       </div>
 
+      {/* ---------- Schedule -------- */}
       <hr className="border-t-2 border-gray-300 my-10" />
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+      <h2 className="text-2xl text-center font-bold mb-6 flex items-center gap-2">
         <MdDirectionsBus className="text-blue-500" /> View Schedule
       </h2>
       {/* Mode and Route Selection */}
@@ -324,26 +345,18 @@ const AddSchedule = () => {
                 <FaRoute /> Select Route
               </span>
             </label>
+
             <select
               className="select select-bordered w-full"
               value={selectedRoute}
               onChange={(e) => setSelectedRoute(e.target.value)}
             >
-              <option value="">
-                All Routes (
-                {
-                  routes.filter((r) => schedules.some((s) => s.mode === selectedMode && s.routeId?._id === r._id))
-                    .length
-                }
-                )
-              </option>
-              {routes
-                .filter((route) => schedules.some((s) => s.mode === selectedMode && s.routeId?._id === route._id))
-                .map((route) => (
-                  <option key={route._id} value={route._id}>
-                    {route.name} ({route.startLocation} to {route.endLocation})
-                  </option>
-                ))}
+              <option value="">Select Route</option>
+              {routes.map((route) => (
+                <option key={route._id} value={route._id}>
+                  {route.routeNo + ": " + route.routeName}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -375,7 +388,7 @@ const AddSchedule = () => {
                         <FaUserGraduate className="text-blue-600" />
                         <span>Student Schedules</span>
                       </div>
-                      <hr className="border-t-2 border-gray-300 mb-4" />
+                      <hr className="border-t-2 border-muted-300 mb-4" />
 
                       <div className="grid grid-cols-2">
                         {/* Weekdays */}
@@ -490,7 +503,7 @@ const AddSchedule = () => {
                         <FaUserTie className="text-blue-600" />
                         <span>Employee Schedules</span>
                       </div>
-                      <hr className="border-t-2 border-gray-300 mb-4" />
+                      <hr className="border-t-2 border-muted-300 mb-4" />
 
                       <div className="grid grid-cols-2">
                         {/* Weekdays */}

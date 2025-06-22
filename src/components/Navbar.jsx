@@ -8,7 +8,7 @@ function Navbar() {
   return (
     <div className="drawer ">
       <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex flex-col bg-gray-100">
+      <div className="drawer-content flex flex-col bg-muted-100">
         {/* Navbar */}
         <div className="navbar bg-slate-700 text-black shadow-md px-4">
           <div className="flex-none lg:hidden">

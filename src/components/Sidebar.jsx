@@ -19,7 +19,7 @@ function Sidebar() {
   ];
 
   return (
-    <div className="drawer lg:drawer-open bg-gray-50">
+    <div className="drawer lg:drawer-open bg-muted-50">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
 
       <div className="drawer-content">
@@ -33,7 +33,7 @@ function Sidebar() {
         <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
 
         <ul className="menu p-5 w-72 min-h-full bg-slate-700 text-white space-y-2">
-          <h2 className="text-xl font-semibold mb-4 text-gray-100">Admin Menu</h2>
+          <h2 className="text-xl font-semibold mb-4 text-muted-100">Admin Menu</h2>
 
           {navItems.map((item) => (
             <li key={item.to}>
@@ -41,8 +41,8 @@ function Sidebar() {
                 to={item.to}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                   isActive(item.to)
-                    ? "bg-gray-800 text-white font-bold"
-                    : "hover:bg-gray-900 hover:text-white text-gray-300"
+                    ? "bg-muted-800 text-white font-bold"
+                    : "hover:bg-muted-900 hover:text-white text-muted-300"
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
