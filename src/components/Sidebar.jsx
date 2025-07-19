@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaRoute, FaCalendarPlus, FaCalendarCheck, FaBus, FaTachometerAlt, FaInfo } from "react-icons/fa";
+import { FaRoute, FaCalendarPlus, FaCalendarCheck, FaBus, FaTachometerAlt, FaInfo, FaMarker } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 
 function Sidebar() {
@@ -15,6 +15,7 @@ function Sidebar() {
     { label: "Schedule", to: "/add-schedule", icon: <FaCalendarPlus /> },
     // { label: "View Schedules", to: "/view-schedules", icon: <FaCalendarCheck /> },
     { label: "Buses", to: "/bus", icon: <FaBus /> },
+    { label: "Map", to: "/map", icon: <FaMarker /> },
     { label: "Logs", to: "/logs", icon: <FaInfo /> },
   ];
 

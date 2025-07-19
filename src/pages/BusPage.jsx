@@ -14,8 +14,6 @@ const BusPage = () => {
     busType: BUS_TYPES.STUDENT,
     capacity: "",
     status: BUS_STATUS.ACTIVE,
-    assignedRouteId: "",
-    assignedDriverId: "",
   });
 
   const [editId, setEditId] = useState(null);
@@ -184,7 +182,7 @@ const BusPage = () => {
             >
               {Object.values(BUS_STATUS).map((status) => (
                 <option className="capitalize" key={status} value={status}>
-                  { status}
+                  {status}
                 </option>
               ))}
             </select>
