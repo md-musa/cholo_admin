@@ -25,11 +25,11 @@ const BusPage = () => {
 
       // Fetch buses
       const busesResponse = await apiClient.get("/buses");
-      setBuses(busesResponse.data.data);
+      setBuses(busesResponse.data);
 
       // Fetch routes for dropdown
       const routesResponse = await apiClient.get("/routes");
-      setRoutes(routesResponse.data.data);
+      setRoutes(routesResponse.data);
 
       dismissToast(loadingToast);
       showSuccess("Data loaded successfully");

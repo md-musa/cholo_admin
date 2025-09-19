@@ -18,7 +18,7 @@ const RoutePage = () => {
       setLoading(true);
       const loadingToast = showLoading("Fetching routes...");
       const response = await apiClient.get("/routes");
-      setRoutes(response.data.data);
+      setRoutes(response.data);
       dismissToast(loadingToast);
       showSuccess("Routes loaded successfully");
     } catch (err) {

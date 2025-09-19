@@ -31,7 +31,7 @@ function Logs() {
             sort: sortOrder === "desc" ? "-createdAt" : "createdAt",
           },
         });
-        setLogs(res.data.data);
+        setLogs(res.data);
       } catch (err) {
         showError(err.response?.data?.message || "Failed to fetch logs");
         console.error(err);

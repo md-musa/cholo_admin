@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const SERVER_URL = "http://localhost:4000/api/v1";
-// const SERVER_URL = "https://choloserver-production.up.railway.app/api/v1";
+// const SERVER_URL = "http://localhost:4000/api/v1";
+const SERVER_URL = "https://choloserver-production.up.railway.app/api/v1";
 // const SERVER_URL = `https://tms-dcro.onrender.com/api/v1`;
 
 const apiClient = axios.create({
@@ -27,7 +27,7 @@ apiClient.interceptors.request.use(
 
 // Response Interceptor (Optional)
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => response.data,
   (error) => {
     console.error("🟥🟥 sAPI Error:", error.response?.data || error.message);
     return Promise.reject(error);

@@ -31,7 +31,7 @@ const MapPage = () => {
     async function fetchRoutes() {
       try {
         const { data } = await apiClient.get("routes");
-        setCurrentRoute(data.data[0]);
+        setCurrentRoute(data[0]);
       } catch (err) {
         console.error("Error fetching route:", err);
       }
@@ -51,7 +51,7 @@ const MapPage = () => {
           nfcUid: "xxxx",
           coords: [clickedPosition[1], clickedPosition[0]],
         });
-        setNearestStopage(data.data);
+        setNearestStopage(data);
       } catch (err) {
         console.error("Error fetching route:", err);
       }
