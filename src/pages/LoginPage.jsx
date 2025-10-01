@@ -1,61 +1,98 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSignInAlt } from "react-icons/fa";
 
 function Login() {
-  const { login } = useAuth();
+  const { login, userData } = useAuth();
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  // Redirect if already logged in
+  useEffect(() => {
+    if (userData) navigate("/schedules");
+  }, [userData, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = login({email, password});
-    if (result.success) {
-      navigate("/dashboard");
-    } else {
-      setError(result.message || "Login failed");
-      console.error("Login error:", result.error);
+    setLoading(true);
+    setError("");
+
+    try {
+      const result = await login({ email, password });
+    } catch (err) {
+      console.error("Network or server error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200">
-      <div className="w-full max-w-sm p-8 shadow-lg rounded-lg bg-white">
-        <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
+      <div className="w-full max-w-sm p-8 py-20 shadow-lg rounded-lg bg-white">
+        {/* Website Name */}
+        <h1 className="text-3xl font-bold text-center mb-6 text-blue-900">Cholo Admin</h1>
+
         <form onSubmit={handleSubmit}>
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text">Email</span>
-            </label>
-            <input
-              type="email"
-              className="input input-bordered"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+          {/* Email Input */}
+          <div className="form-control mb-4 relative">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                <FaEnvelope />
+              </span>
+              <input
+                type="email"
+                className="input input-bordered px-4 text-md w-full"
+                value={email}
+                placeholder="Enter your email"
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="username"
+              />
+            </div>
           </div>
 
-          <div className="form-control mb-6">
-            <label className="label">
-              <span className="label-text">Password</span>
-            </label>
-            <input
-              type="password"
-              className="input input-bordered"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+          {/* Password Input */}
+          <div className="form-control mb-6 relative">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                <FaLock />
+              </span>
+              <input
+                type={showPassword ? "text" : "password"}
+                className="input input-bordered px-4 w-full"
+                value={password}
+                placeholder="Enter your password"
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="absolute right-5 cursor-pointer top-1/2 transform -translate-y-1/2 text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
 
-          {error && <p className="text-red-500 mb-4">{error}</p>}
+          {/* Error Message */}
+          {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 
-          <button type="submit" className="btn btn-primary w-full">
-            Login
+          {/* Login Button */}
+          <button
+            type="submit"
+            className={`btn btn-primary w-full flex items-center justify-center gap-2 ${loading ? "loading" : ""}`}
+            disabled={loading}
+          >
+            <FaSignInAlt />
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

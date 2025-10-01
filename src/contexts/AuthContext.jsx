@@ -10,58 +10,39 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  console.log(userData);
+  // Load user from localStorage on mount
   useEffect(() => {
-    const loadUserData = () => {
-      try {
-        const auth = localStorage.getItem("auth");
-
-        if (auth) {
-          const parsedAuth = JSON.parse(auth);
-
-          setUserData({
-            ...parsedAuth,
-          });
-
-          if (parsedAuth.accessToken) {
-            navigate("/dashboard", { replace: true });
-          }
-        } else {
-          setUserData(null);
-          navigate("/", { replace: true });
-        }
-      } catch (err) {
-        console.error("Error loading session:", err);
-        toast.error("Failed to load your session.");
-      } finally {
-        setLoading(false);
+    try {
+      const storedAuth = localStorage.getItem("auth");
+      if (storedAuth) {
+        const parsedAuth = JSON.parse(storedAuth);
+        setUserData(parsedAuth);
       }
-    };
-
-    loadUserData();
+    } catch (err) {
+      console.error("Error loading session:", err);
+      toast.error("Failed to load your session.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  // Helper to handle successful login/registration
+  const handleAuthSuccess = (user, accessToken, redirectPath = "/schedules") => {
+    const { _id, name, email, role } = user;
+    const authPayload = { userId: _id, name, email, role, accessToken };
+
+    localStorage.setItem("auth", JSON.stringify(authPayload));
+    setUserData(authPayload);
+    toast.success(`Welcome ${name}!`);
+    navigate(redirectPath, { replace: true });
+  };
+
+  // Registration
   const registration = async (data) => {
     try {
       setLoading(true);
       const { data: result } = await registerUser(data);
-      const { accessToken, user } = result.data;
-      const { _id, name, email, role, routeId } = user;
-
-      const authPayload = {
-        userId: _id,
-        accessToken,
-        name,
-        email,
-        role,
-      };
-
-      localStorage.setItem("auth", JSON.stringify(authPayload));
-
-      setUserData({ ...authPayload });
-
-      toast.success(`Welcome ${name}!`);
-      navigate("/dashboard", { replace: true });
+      handleAuthSuccess(result.data.user, result.data.accessToken);
     } catch (err) {
       console.error("Registration error:", err);
       toast.error(err?.response?.data?.message || "Registration failed.");
@@ -70,34 +51,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Login
   const login = async (data) => {
     try {
       setLoading(true);
       const { data: result } = await loginUser(data);
-      const { accessToken, user } = result.data;
-      const { _id, name, email, role, routeId } = user;
-
-      const authPayload = {
-        userId: _id,
-        accessToken,
-        name,
-        email,
-        role,
-      };
-
-      localStorage.setItem("auth", JSON.stringify(authPayload));
-
-      setUserData({ ...authPayload });
-
-      toast.success(`Welcome back, ${name}!`);
-      navigate("/dashboard", { replace: true });
+      console.log("Login result:", result);
+      handleAuthSuccess(result.user, result.accessToken);
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Login failed.");
+      console.error("Login error:", err);
+      toast.error(err?.response?.data?.errorMessages?.[0]?.message || "Login failed.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Logout
   const logout = () => {
     try {
       localStorage.removeItem("auth");
@@ -128,8 +97,6 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used inside AuthProvider");
   return context;
 };

@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { FaBus, FaUser } from "react-icons/fa";
+import { FaBus, FaUser, FaCalendarAlt } from "react-icons/fa";
 import apiClient from "../config/axiosConfig";
-import { showSuccess, showError, showLoading, dismissToast } from "../utils/toastUtils";
+import { showSuccess, showError } from "../utils/toastUtils";
 
 function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
   const [busOptions, setBusOptions] = useState([]);
   const [driverOptions, setDriverOptions] = useState([]);
   const [selectedBus, setSelectedBus] = useState("");
   const [selectedDriver, setSelectedDriver] = useState("");
+  const [assignmentType, setAssignmentType] = useState("fixed"); // default fixed
+  const [specificDate, setSpecificDate] = useState("");
   const [loading, setLoading] = useState(false);
-  console.log("Schedule ID for assignment:", scheduleId);
 
-  // Fetch available buses and drivers
+  // Fetch buses and drivers
   useEffect(() => {
     async function fetchBuses() {
       try {
@@ -25,7 +26,6 @@ function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
     async function fetchDrivers() {
       try {
         const res = await apiClient.get("/auth/drivers");
-        console.log("Fetched drivers:", res.data);
         setDriverOptions(res.data);
       } catch (err) {
         console.error(err);
@@ -39,19 +39,26 @@ function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
   const handleSubmit = async () => {
     if (!selectedBus) return showError("Please select a bus");
     if (!selectedDriver) return showError("Please select a driver");
+    if (assignmentType === "one-off" && !specificDate) return showError("Please select a date");
 
     const payload = {
       driverId: selectedDriver,
       busId: selectedBus,
-      scheduleId: scheduleId,
+      scheduleId,
+      assignmentType,
+      specificDate: assignmentType === "one-off" ? specificDate : undefined,
     };
 
     try {
-      const res = await apiClient.post("/schedule-assignments", payload);
+      setLoading(true);
+      await apiClient.post("/assignments", payload);
       showSuccess("Bus assigned successfully");
+      onAssignmentUpdated?.(); // refresh list
       onClose();
     } catch (err) {
       showError(err.response?.data?.message || "Failed to assign bus");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +76,7 @@ function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
             className="select select-bordered w-full"
             value={selectedBus}
             onChange={(e) => setSelectedBus(e.target.value)}
+            required
           >
             <option value="">Select Bus</option>
             {busOptions.map((bus) => (
@@ -97,6 +105,35 @@ function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
             ))}
           </select>
         </div>
+
+        {/* Assignment Type */}
+        <div className="mb-4">
+          <label className="label flex items-center gap-1">Assignment Type</label>
+          <select
+            className="select select-bordered w-full"
+            value={assignmentType}
+            onChange={(e) => setAssignmentType(e.target.value)}
+          >
+            <option value="fixed">Fixed</option>
+            <option value="one-off">One-off</option>
+          </select>
+        </div>
+
+        {/* Date field for One-off */}
+        {assignmentType === "one-off" && (
+          <div className="mb-4">
+            <label className="label flex items-center gap-1">
+              <FaCalendarAlt /> Select Date
+            </label>
+            <input
+              type="date"
+              className="input input-bordered w-full"
+              value={specificDate}
+              onChange={(e) => setSpecificDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]} // disable past dates
+            />
+          </div>
+        )}
 
         {/* Buttons */}
         <div className="flex justify-end gap-2 mt-4">
