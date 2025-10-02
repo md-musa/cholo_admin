@@ -6,7 +6,6 @@ export function DirectionSchedules({
   directionSchedules,
   direction,
   iconRotation,
-  onAdd,
   addSchedule,
   editSchedule,
   deleteSchedule,
@@ -14,10 +13,11 @@ export function DirectionSchedules({
   editBus,
   deleteBus,
   fetchSchedule,
+  metadata,
 }) {
   return (
-    <div className="bg-gray-50 border border-gray-300 p-2 rounded">
-      <div className="flex items-center gap-2 mb-2">
+    <div className="bg-gray-50 border border-gray-300 p-3 mx-2 rounded">
+      <div className="flex items-center gap-2 mb-2 font-semibold">
         <FaExchangeAlt className={`text-green-500 ${iconRotation}`} />
         <span>{direction}</span>
         <span className="badge badge-sm">{directionSchedules?.length || 0} trips</span>
@@ -35,6 +35,7 @@ export function DirectionSchedules({
             editBus={editBus}
             deleteBus={deleteBus}
             fetchSchedule={fetchSchedule}
+            metadata={metadata}
           />
         ))
       ) : (
@@ -42,7 +43,7 @@ export function DirectionSchedules({
       )}
 
       <button
-        onClick={onAdd}
+        onClick={() => addSchedule(metadata.direction, metadata.operatingDays, metadata.userType)}
         className="btn btn-xs btn-outline btn-success mt-2 w-full flex items-center justify-center gap-1"
       >
         <FaPlus /> Add Schedule

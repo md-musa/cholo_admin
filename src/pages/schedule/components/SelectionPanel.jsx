@@ -4,7 +4,7 @@ import { getEnumLabel } from "../../../utils/scheduleutil";
 
 export function SelectionPanel({ selectedMode, selectedRoute, routes, onModeChange, onRouteChange }) {
   return (
-    <div className="bg-base-200 p-4 rounded-lg mb-6">
+    <div className="bg-slate-700 border-2 border-gray-300 p-4 pb-6 rounded-lg mb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <RouteSelector selectedRoute={selectedRoute} routes={routes} onRouteChange={onRouteChange} />
         <ModeSelector selectedMode={selectedMode} onModeChange={onModeChange} />
@@ -15,8 +15,8 @@ export function SelectionPanel({ selectedMode, selectedRoute, routes, onModeChan
 
 function ModeSelector({ selectedMode, onModeChange }) {
   return (
-    <div>
-      <label className="label">
+    <div className="px-4">
+      <label className="label text-white mb-2">
         <span className="label-text flex items-center gap-2">
           <FaCalendarAlt /> Schedule Mode
         </span>
@@ -34,8 +34,8 @@ function ModeSelector({ selectedMode, onModeChange }) {
 
 function RouteSelector({ selectedRoute, routes, onRouteChange }) {
   return (
-    <div>
-      <label className="label">
+    <div className="px-4">
+      <label className="label text-white mb-2">
         <span className="label-text flex items-center gap-2">
           <FaRoute /> Select Route
         </span>

@@ -1,7 +1,7 @@
 import React from "react";
 import { FaBus, FaUser, FaEdit, FaTrash, FaClock, FaWheelchair, FaUserCircle } from "react-icons/fa";
 
-export default function AssignedBusCard({ scheduleId, assigned, variant = "fixed", onEditBus, onDeleteBus }) {
+export default function AssignedBusCard({ scheduleId, assigned, variant = "fixed", onEditBus, onDeleteBus, metadata }) {
   const busName = assigned?.busId?.name || "Bus Not Assigned";
   const driverName = assigned?.driverId?.name || "Not Assigned";
   const dateLabel = assigned?.specificDate ? new Date(assigned.specificDate).toLocaleDateString() : null;
@@ -11,7 +11,7 @@ export default function AssignedBusCard({ scheduleId, assigned, variant = "fixed
 
   return (
     <div
-      className={`relative bg-white ${borderClass} border rounded-lg shadow-sm py-3 px-2 group`}
+      className={`relative bg-white ${borderClass} border border-gray-300 rounded-md py-2 my-2 px-2 group`}
       role="group"
       aria-label={`Assignment for ${busName}`}
       tabIndex={0}

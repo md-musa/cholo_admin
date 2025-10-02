@@ -1,6 +1,7 @@
 import { FaRoute } from "react-icons/fa";
 
 export function RouteHeader({ groupedSchedule }) {
+  console.log("Rendering RouteHeader with groupedSchedule:", groupedSchedule);
   return (
     <div className="bg-primary text-primary-content p-4 rounded-t-lg">
       <h3 className="text-xl font-bold flex items-center gap-2">

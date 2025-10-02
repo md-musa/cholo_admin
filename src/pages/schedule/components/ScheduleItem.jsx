@@ -12,13 +12,13 @@ import AssignedBusCard from "./AssignedBusCard";
  * - editBus(scheduleId, assigned)
  * - deleteBus(scheduleId, assignedId)
  */
-export function ScheduleItem({ schedule, editSchedule, deleteSchedule, assignBus, editBus, deleteBus }) {
+export function ScheduleItem({ schedule, editSchedule, deleteSchedule, assignBus, editBus, deleteBus, metadata }) {
   const formattedTime = schedule?.time ? moment(schedule.time, "HH:mm").format("hh:mm A") : "Not Scheduled";
   const assignedBuses = schedule?.assignedBuses || [];
 
   return (
     // top-level "group" so children can show controls on hover/focus
-    <div className="group relative my-5 bg-white border border-gray-300 rounded-lg shadow-sm p-4">
+    <div className="group relative my-5 bg-white border border-gray-300 rounded-lg shadow-sm p-3">
       {/* Header: time + (hover) controls */}
       <div className="flex items-start justify-between gap-4">
         <div className="w-full">
@@ -85,9 +85,10 @@ export function ScheduleItem({ schedule, editSchedule, deleteSchedule, assignBus
                   key={assigned._id}
                   scheduleId={schedule._id}
                   assigned={assigned}
-                  variant="fixed" // or "fixed"
-                  onEditBus={editBus} // pass your handler
-                  onDeleteBus={deleteBus} // pass your handler
+                  variant="fixed" 
+                  onEditBus={editBus} 
+                  onDeleteBus={deleteBus} 
+                  metadata= {{...metadata, busData: assigned}}
                 />
               ))
           )}

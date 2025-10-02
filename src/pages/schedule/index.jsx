@@ -27,10 +27,18 @@ function SchedulePage() {
     note: "",
     serviceType: "",
   });
+  const [busForm, setBusForm] = useState({
+    driverId: "",
+    busId: "",
+    assignmentType: "fixed",
+    specificDate: "",
+  });
 
   const [modalVisible, setModalVisible] = useState(false);
   const [busAssignModalVisible, setBusAssignModalVisible] = useState(false);
   const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+  const [editingSchedule, setEditingSchedule] = useState(false);
+  const [editingBus, setEditingBus] = useState(false);
 
   // ========================
   // Fetching Data
@@ -49,7 +57,7 @@ function SchedulePage() {
     try {
       const schedulesResponse = await apiClient.get(`/schedules/admin/route/${selectedRoute}`);
       setSchedules(schedulesResponse.data);
-      showSuccess("Schedules loaded successfully");
+      // showSuccess("Schedules loaded successfully");
     } catch (err) {
       showError(err.response?.data?.message || "Failed to load schedules");
     }
@@ -61,7 +69,7 @@ function SchedulePage() {
 
   useEffect(() => {
     fetchSchedule();
-  }, [selectedRoute, modalVisible, busAssignModalVisible]);
+  }, [selectedRoute]);
 
   const groupedSchedule = groupSchedule(schedules);
 
@@ -88,6 +96,7 @@ function SchedulePage() {
       ...schedule,
     });
     setModalVisible(true);
+    setEditingSchedule(true);
   };
 
   const deleteSchedule = async (scheduleId) => {
@@ -109,15 +118,24 @@ function SchedulePage() {
     setBusAssignModalVisible(true);
   };
 
-  const editBus = (busData) => {
-    // Example: pre-fill bus data into assign modal
-    setSelectedScheduleId(busData.scheduleId);
+  const editBus = (scheduleId, assignment) => {
+    console.log("Editing bus assignment:", assignment);
+    setBusForm({
+      _id: assignment?._id || "",
+      driverId: assignment?.driverId?._id || "",
+      busId: assignment?.busId?._id || "",
+      assignmentType: assignment?.assignmentType || "fixed",
+      specificDate: assignment?.specificDate || "",
+    });
+    setSelectedScheduleId(scheduleId);
     setBusAssignModalVisible(true);
+    setEditingBus(true);
   };
 
-  const deleteBus = async (busId) => {
+  const deleteBus = async (scheduleId, assignmentId) => {
+    console.log("Deleting bus assignment:", assignmentId);
     try {
-      await apiClient.delete(`/buses/${busId}`);
+      await apiClient.delete(`/assignments/${assignmentId}`);
       showSuccess("Bus deleted successfully");
       fetchSchedule();
     } catch (err) {
@@ -128,8 +146,25 @@ function SchedulePage() {
   // ========================
   // Render
   // ========================
+
+  if (!selectedRoute) {
+    return (
+      <div className="p-6">
+        <Header />
+        <SelectionPanel
+          selectedMode={selectedMode}
+          selectedRoute={selectedRoute}
+          routes={routes}
+          onModeChange={(e) => setSelectedMode(e.target.value)}
+          onRouteChange={(e) => setSelectedRoute(e.target.value)}
+        />
+        <div className="mt-8 text-center text-gray-500">Please select a route to view schedules.</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
+    <div className="p-3">
       <Header />
 
       <SelectionPanel
@@ -151,10 +186,28 @@ function SchedulePage() {
         fetchSchedule={fetchSchedule}
       />
 
-      {modalVisible && <AddScheduleModal form={form} onClose={() => setModalVisible(false)} />}
+      {modalVisible && (
+        <AddScheduleModal
+          form={form}
+          onClose={() => setModalVisible(false)}
+          fetchSchedule={fetchSchedule}
+          editingSchedule={editingSchedule}
+          setEditingSchedule={setEditingSchedule}
+        />
+      )}
 
       {busAssignModalVisible && (
-        <BusAssignModal scheduleId={selectedScheduleId} onClose={() => setBusAssignModalVisible(false)} />
+        <BusAssignModal
+          scheduleId={selectedScheduleId}
+          onClose={() => {
+            setBusAssignModalVisible(false);
+            setEditingBus(false);
+          }}
+          fetchSchedule={fetchSchedule}
+          metadata={busForm}
+          editingBus={editingBus}
+          setEditingBus={setEditingBus}
+        />
       )}
     </div>
   );
@@ -171,34 +224,30 @@ function ScheduleDisplay({
   fetchSchedule,
 }) {
   return (
-    <div className="space-y-8">
-      <div className="card bg-base-100 shadow-lg">
-        <div className="card-body p-0">
-          <RouteHeader groupedSchedule={groupedSchedule} />
-          <div className="p-4">
-            <StudentSchedules
-              groupedSchedule={groupedSchedule}
-              addSchedule={addSchedule}
-              editSchedule={editSchedule}
-              deleteSchedule={deleteSchedule}
-              assignBus={assignBus}
-              editBus={editBus}
-              deleteBus={deleteBus}
-              fetchSchedule={fetchSchedule}
-            />
-            <EmployeeSchedules
-              groupedSchedule={groupedSchedule}
-              addSchedule={addSchedule}
-              editSchedule={editSchedule}
-              deleteSchedule={deleteSchedule}
-              assignBus={assignBus}
-              editBus={editBus}
-              deleteBus={deleteBus}
-              fetchSchedule={fetchSchedule}
-            />
-          </div>
-        </div>
-      </div>
+    <div className="">
+      {/* <RouteHeader groupedSchedule={groupedSchedule} /> */}
+      <StudentSchedules
+        groupedSchedule={groupedSchedule}
+        addSchedule={addSchedule}
+        editSchedule={editSchedule}
+        deleteSchedule={deleteSchedule}
+        assignBus={assignBus}
+        editBus={editBus}
+        deleteBus={deleteBus}
+        fetchSchedule={fetchSchedule}
+        metadata={{ userType: SCHEDULE_USER_TYPES.STUDENT }}
+      />
+      <EmployeeSchedules
+        groupedSchedule={groupedSchedule}
+        addSchedule={addSchedule}
+        editSchedule={editSchedule}
+        deleteSchedule={deleteSchedule}
+        assignBus={assignBus}
+        editBus={editBus}
+        deleteBus={deleteBus}
+        fetchSchedule={fetchSchedule}
+        metadata={{ userType: SCHEDULE_USER_TYPES.EMPLOYEE }}
+      />
     </div>
   );
 }

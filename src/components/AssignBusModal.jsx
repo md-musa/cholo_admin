@@ -2,17 +2,18 @@ import React, { useState, useEffect } from "react";
 import { FaBus, FaUser, FaCalendarAlt } from "react-icons/fa";
 import apiClient from "../config/axiosConfig";
 import { showSuccess, showError } from "../utils/toastUtils";
+import moment from "moment";
 
-function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
+function AssignBusModal({ scheduleId, onClose, fetchSchedule, metadata, editingBus, setEditingBus }) {
   const [busOptions, setBusOptions] = useState([]);
   const [driverOptions, setDriverOptions] = useState([]);
   const [selectedBus, setSelectedBus] = useState("");
   const [selectedDriver, setSelectedDriver] = useState("");
-  const [assignmentType, setAssignmentType] = useState("fixed"); // default fixed
+  const [assignmentType, setAssignmentType] = useState("fixed");
   const [specificDate, setSpecificDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch buses and drivers
+  // Fetch bus + driver options
   useEffect(() => {
     async function fetchBuses() {
       try {
@@ -36,25 +37,45 @@ function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
     fetchDrivers();
   }, []);
 
+  // Prefill values in edit mode
+  useEffect(() => {
+    if (editingBus) {
+      setSelectedBus(metadata.busId || "");
+      setSelectedDriver(metadata.driverId || "");
+      setAssignmentType(metadata.assignmentType || "fixed");
+      setSpecificDate(metadata.specificDate || "");
+    }
+  }, [editingBus]);
+
   const handleSubmit = async () => {
     if (!selectedBus) return showError("Please select a bus");
-    if (!selectedDriver) return showError("Please select a driver");
     if (assignmentType === "one-off" && !specificDate) return showError("Please select a date");
 
     const payload = {
-      driverId: selectedDriver,
       busId: selectedBus,
       scheduleId,
       assignmentType,
       specificDate: assignmentType === "one-off" ? specificDate : undefined,
     };
 
+    if (selectedDriver) payload.driverId = selectedDriver;
+
     try {
       setLoading(true);
-      await apiClient.post("/assignments", payload);
-      showSuccess("Bus assigned successfully");
-      onAssignmentUpdated?.(); // refresh list
+
+      if (editingBus) {
+        console.log("meta data", metadata);
+        console.log("Editing assignment with payload:", payload);
+        await apiClient.put(`/assignments/${metadata._id}`, payload);
+        showSuccess("Bus assignment updated successfully");
+      } else {
+        await apiClient.post("/assignments", payload);
+        showSuccess("Bus assigned successfully");
+      }
+
+      fetchSchedule();
       onClose();
+      setEditingBus(false);
     } catch (err) {
       showError(err.response?.data?.message || "Failed to assign bus");
     } finally {
@@ -65,7 +86,9 @@ function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg w-3/6 max-h-[90vh] overflow-y-auto">
-        <h3 className="text-lg font-bold mb-4">Assign Bus & Driver</h3>
+        <h3 className="text-lg font-bold mb-4">
+          {editingBus ? "Edit Bus & Driver Assignment" : "Assign Bus & Driver"}
+        </h3>
 
         {/* Bus Selection */}
         <div className="mb-4">
@@ -81,7 +104,7 @@ function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
             <option value="">Select Bus</option>
             {busOptions.map((bus) => (
               <option key={bus._id} value={bus._id}>
-                {bus.name}
+                {bus.name.charAt(0).toUpperCase() + bus.name.slice(1)}
               </option>
             ))}
           </select>
@@ -128,20 +151,24 @@ function AssignBusModal({ scheduleId, onClose, onAssignmentUpdated }) {
             <input
               type="date"
               className="input input-bordered w-full"
-              value={specificDate}
+              value={specificDate ? moment(specificDate).format("YYYY-MM-DD") : ""}
               onChange={(e) => setSpecificDate(e.target.value)}
-              min={new Date().toISOString().split("T")[0]} // disable past dates
+              min={moment().format("YYYY-MM-DD")}
             />
           </div>
         )}
 
         {/* Buttons */}
         <div className="flex justify-end gap-2 mt-4">
-          <button className="btn btn-sm btn-outline btn-error" onClick={onClose}>
+          <button className="btn btn-sm btn-outline btn-error" onClick={onClose} disabled={loading}>
             Cancel
           </button>
-          <button className={`btn btn-sm btn-success ${loading ? "loading" : ""}`} onClick={handleSubmit}>
-            Assign
+          <button
+            className={`btn btn-sm btn-success ${loading ? "loading" : ""}`}
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? "Saving..." : editingBus ? "Update" : "Assign"}
           </button>
         </div>
       </div>
