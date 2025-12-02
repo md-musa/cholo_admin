@@ -1,10 +1,10 @@
 import { Routes, Route } from "react-router-dom";
-import RoutePage from "./pages/RoutePage";
 import Sidebar from "./components/Sidebar";
 import LoginPage from "./pages/LoginPage";
-import BusPage from "./pages/BusPage";
 import Logs from "./pages/Logs";
 import SchedulePage from "./pages/schedule";
+import BusPage from "./pages/bus";
+import RoutePage from "./pages/route";
 
 const DashboardLayout = () => {
   return (

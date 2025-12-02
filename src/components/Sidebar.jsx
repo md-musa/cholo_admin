@@ -37,7 +37,7 @@ function Sidebar() {
       {/* Sidebar drawer */}
       <div
         className={`fixed inset-y-0 left-0 z-40 transition-all duration-200
-        ${drawerOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static lg:flex`}
+        ${drawerOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static lg:flex h-full`}
       >
         <aside
           className={`${
